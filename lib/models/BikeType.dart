@@ -8,4 +8,7 @@ class BikeType {
       count: json['count'] ?? 0,
     );
   }
+
+
+
 }
