@@ -1,10 +1,39 @@
-class Station{
-  final int last_updated,
-  final int num_bikes_available,
-  final List<> vehicle_docks_available,
+import 'package:to7_1/models/BikeType.dart';
 
-  Station({required this.last_updated, required this.num_bikes_available})
-  
+class Station {
+  Station({
+    required this.id,
+    required this.name,
+    required this.capacity,
+    required this.numBikesAvailable, // = 0,
+    required this.numDocksAvailable, // = 0,
+    required this.lastReported, // = 0,
+    required this.availableTypes, // = cont[],
+  });
 
+  //https://acoruna.publicbikesystem.net/customer/gbfs/v2/gl/station_information
+  final String id;
+  final String name;
+  final int capacity;
+  //https://acoruna.publicbikesystem.net/customer/gbfs/v2/gl/station_status
+  final int numBikesAvailable;
+  final int numDocksAvailable;
+  final int lastReported;
+  final List<BikeType> availableTypes;
+
+  factory Station.fromJson(Map<String, dynamic> json) {
+    return Station(
+      id: json['station_id'] ?? 'id unknown',
+      name: json['name'] ?? 'name unknown',
+      capacity: json['capacity'] ?? 0,
+      numBikesAvailable: json['num_bikes_available'] ?? 0,
+      numDocksAvailable: json['num_docks_available'] ?? 0,
+      lastReported: json['last_reported'] ?? 0,
+      availableTypes: [],
+    );
+  }
+
+  String getName() {
+    return name;
+  }
 }
-//https://acoruna.publicbikesystem.net/customer/gbfs/v2/gl/station_status
