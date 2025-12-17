@@ -7,160 +7,182 @@ class StationDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 1. Convertir fecha
-    final date = DateTime.fromMillisecondsSinceEpoch(
+    final DateTime updateTime = DateTime.fromMillisecondsSinceEpoch(
       station.lastReported * 1000,
     );
-    final hora =
-        "${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}";
+    final String timeStr =
+        "${updateTime.hour.toString().padLeft(2, '0')}:${updateTime.minute.toString().padLeft(2, '0')}";
 
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Center(
-          child: Text(
-            station.name,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 20,
-              color: Colors.black,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
+        title: Text(station.name, style: const TextStyle(color: Colors.black)),
         backgroundColor: Colors.white,
+        iconTheme: const IconThemeData(color: Colors.black),
         elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
-          tooltip: 'Volver',
-          onPressed: () => Navigator.of(context).pop(),
-        ),
       ),
-      body: Padding(
-        padding: EdgeInsets.all(24.0),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                Icon(Icons.access_time_rounded, size: 18, color: Colors.grey),
-                SizedBox(width: 6),
-                Text(
-                  "Actualizado a las $hora",
-                  style: TextStyle(fontSize: 14, color: Colors.grey),
-                ),
-              ],
-            ),
-
-            SizedBox(height: 32),
-
-            Row(
-              children: [
-                _InfoCard(
-                  label: "Total",
-                  value: "${station.capacity}",
-                  icon: Icons.dns_rounded,
-                  color: Colors.blue,
-                ),
-                SizedBox(width: 12),
-                _InfoCard(
-                  label: "Huecos libres",
-                  value: "${station.numDocksAvailable}",
-                  icon: Icons.local_parking_rounded,
-                  color: Colors.grey,
-                ),
-                SizedBox(width: 12),
-                _InfoCard(
-                  label: "Bicis disponibles",
-                  value: "${station.numBikesAvailable}",
-                  icon: Icons.pedal_bike_rounded,
-                  color: Colors.green,
-                ),
-              ],
-            ),
-
-            SizedBox(height: 32),
-
             Text(
-              "Disponibilidad",
+              "Actualizado: $timeStr",
+              style: const TextStyle(color: Colors.grey),
+            ),
+            const SizedBox(height: 20),
+
+            Container(
+              margin: const EdgeInsets.only(bottom: 15),
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.green, width: 2),
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.pedal_bike, color: Colors.green, size: 30),
+                      const SizedBox(width: 15),
+                      Text(
+                        "Bicis disponibles",
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Text(
+                    "${station.numBikesAvailable}",
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.green,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            Container(
+              margin: const EdgeInsets.only(bottom: 15),
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.greenAccent, width: 2),
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.pedal_bike,
+                        color: Colors.greenAccent,
+                        size: 30,
+                      ),
+                      const SizedBox(width: 15),
+                      Text(
+                        "Anclajes libres",
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Text(
+                    "${station.numDocksAvailable}",
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.greenAccent,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            Container(
+              margin: const EdgeInsets.only(bottom: 15),
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.blue, width: 2),
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.pedal_bike, color: Colors.blue, size: 30),
+                      const SizedBox(width: 15),
+                      Text(
+                        "Puestos totales",
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Text(
+                    "${station.capacity}",
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const Divider(height: 40),
+            const Text(
+              "Detalle por tipo",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 10),
 
-            if (station.availableTypes.isEmpty)
-              Container(
-                padding: EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.grey[100],
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.info_outline, color: Colors.grey[500]),
-                    SizedBox(width: 12),
-                    Text(
-                      "No hay información detallada.",
-                      style: TextStyle(color: Colors.grey[600]),
-                    ),
-                  ],
-                ),
-              )
-            else
-              ...station.availableTypes.where((t) => t.count > 0).map((type) {
-                final isElectric =
-                    type.id.toUpperCase().contains('ELECTRIC') ||
-                    type.id.toUpperCase().contains('EF') ||
-                    type.id.toUpperCase().contains('BOOST');
+            ListView(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              children: station.availableTypes.map((type) {
+                final bool isElectric = type.id.toLowerCase().contains("efit");
 
-                // COLORES:
-                final colorTema = isElectric
-                    ? Colors.amber[700]!
-                    : Colors.purple;
-                final colorFondo = isElectric
-                    ? Colors.amber[50]!
-                    : Colors.purple[50]!;
-                final tipoTexto = isElectric ? "Eléctrica" : "Mecánica";
-
-                return Tooltip(
-                  message: '$tipoTexto (Modelo ${type.id})',
-                  triggerMode: TooltipTriggerMode.tap,
-                  child: Container(
-                    margin: EdgeInsets.only(bottom: 12),
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                    decoration: BoxDecoration(
-                      color: colorFondo,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: colorTema.withOpacity(0.3),
-                        width: 1,
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Icon(
-                          isElectric
-                              ? Icons.electric_bolt_rounded
-                              : Icons.pedal_bike_rounded,
-                          color: colorTema,
-                          size: 32,
-                        ),
-
-                        // SOLO NÚMERO
-                        Text(
-                          "${type.count}",
-                          style: TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                            color: colorTema,
-                          ),
-                        ),
-                      ],
+                return ListTile(
+                  leading: Icon(
+                    isElectric
+                        ? Icons.bolt
+                        : type.id.toLowerCase().contains("fit")
+                        ? Icons.directions_bike
+                        : null,
+                    color: Colors.purple,
+                  ),
+                  title: Text(
+                    type.id.toLowerCase().contains("efit")
+                        ? "Eléctrica (EFIT)"
+                        : type.id.toLowerCase().contains("fit")
+                        ? "Mecánica (FIT)"
+                        : " ",
+                  ),
+                  trailing: Text(
+                    type.id.toLowerCase().contains("efit")
+                        ? "${type.count}"
+                        : type.id.toLowerCase().contains("fit")
+                        ? "${type.count}"
+                        : " ",
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 );
-              }),
+              }).toList(),
+            ),
           ],
         ),
       ),
@@ -168,43 +190,54 @@ class StationDetailScreen extends StatelessWidget {
   }
 }
 
-class _InfoCard extends StatelessWidget {
-  final String label;
+// Widget básico para las tarjetas de información
+class _SimpleCard extends StatelessWidget {
+  final String title;
   final String value;
-  final IconData icon;
   final Color color;
+  final IconData icon;
 
-  const _InfoCard({
-    required this.label,
+  const _SimpleCard({
+    required this.title,
     required this.value,
-    required this.icon,
     required this.color,
+    required this.icon,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: Container(
-        padding: EdgeInsets.symmetric(vertical: 20),
-        decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Column(
-          children: [
-            Icon(icon, color: color, size: 28),
-            SizedBox(height: 8),
-            Text(
-              value,
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: color,
+    return Container(
+      margin: const EdgeInsets.only(bottom: 15),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        border: Border.all(color: color.withOpacity(0.5), width: 2),
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              Icon(icon, color: color, size: 30),
+              const SizedBox(width: 15),
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
+            ],
+          ),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: color,
             ),
-            Text(label, style: TextStyle(fontSize: 12)),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
