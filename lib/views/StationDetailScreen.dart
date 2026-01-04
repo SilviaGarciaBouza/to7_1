@@ -3,196 +3,141 @@ import 'package:to7_1/models/Station.dart';
 
 class StationDetailScreen extends StatelessWidget {
   final Station station;
+
   const StationDetailScreen({super.key, required this.station});
 
   @override
   Widget build(BuildContext context) {
-    final DateTime updateTime = DateTime.fromMillisecondsSinceEpoch(
+    Color statusColor = (station.numBikesAvailable == 0)
+        ? Colors.red
+        : (station.numBikesAvailable < 8)
+        ? Colors.orange
+        : Colors.green;
+
+    final date = DateTime.fromMillisecondsSinceEpoch(
       station.lastReported * 1000,
     );
-    final String timeStr =
-        "${updateTime.hour.toString().padLeft(2, '0')}:${updateTime.minute.toString().padLeft(2, '0')}";
+    final time =
+        "${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}";
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(
-        title: Text(station.name, style: const TextStyle(color: Colors.black)),
+        title: Text(station.name),
         backgroundColor: Colors.white,
-        iconTheme: const IconThemeData(color: Colors.black),
-        elevation: 0,
+        foregroundColor: Colors.black,
+        elevation: 1,
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(20),
-        children: [
-          Column(
-            children: [
-              Text(
-                "Actualizado: $timeStr",
-                style: const TextStyle(color: Colors.grey),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            Text(
+              "Actualizado: $time",
+              style: const TextStyle(color: Colors.grey, fontSize: 14),
+            ),
+
+            const SizedBox(height: 25),
+
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(25),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: statusColor, width: 2),
               ),
-              const SizedBox(height: 20),
-              const Divider(height: 40),
-              Container(
-                margin: const EdgeInsets.only(bottom: 15),
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.green, width: 2),
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(Icons.pedal_bike, color: Colors.green, size: 30),
-                        const SizedBox(width: 15),
-                        Text(
-                          "Bicis disponibles",
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
+              child: Column(
+                children: [
+                  Icon(Icons.pedal_bike, size: 40, color: statusColor),
+                  Text(
+                    "${station.numBikesAvailable}",
+                    style: TextStyle(
+                      fontSize: 48,
+                      fontWeight: FontWeight.bold,
+                      color: statusColor,
+                    ),
+                  ),
+                  const Text(
+                    "Bicicletas totales",
+                    style: TextStyle(fontSize: 16, color: Colors.black54),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 15),
+
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: Colors.grey.shade300),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  for (var type in station.availableTypes)
+                    if (!type.id.toLowerCase().contains("boost"))
+                      Column(
+                        children: [
+                          Icon(
+                            type.id.toUpperCase() == 'EFIT'
+                                ? Icons.electric_bike
+                                : Icons.directions_bike,
+                            color: Colors.blueGrey,
                           ),
-                        ),
-                      ],
-                    ),
-                    Text(
-                      "${station.numBikesAvailable}",
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.green,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              Container(
-                margin: const EdgeInsets.only(bottom: 15),
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.greenAccent, width: 2),
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.pedal_bike,
-                          color: Colors.greenAccent,
-                          size: 30,
-                        ),
-                        const SizedBox(width: 15),
-                        Text(
-                          "Puestos vacíos",
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
+                          const SizedBox(height: 4),
+                          Text(
+                            '${type.id.toUpperCase()} Libres',
+                            style: const TextStyle(
+                              fontSize: 11,
+                              color: Colors.grey,
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                    Text(
-                      "${station.numDocksAvailable}",
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.greenAccent,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              Container(
-                margin: const EdgeInsets.only(bottom: 15),
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.blue, width: 2),
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(Icons.pedal_bike, color: Colors.blue, size: 30),
-                        const SizedBox(width: 15),
-                        Text(
-                          "Puestos totales",
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
+                          Text(
+                            "${type.count}",
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                            ),
                           ),
+                        ],
+                      ),
+
+                  Container(height: 40, width: 1, color: Colors.grey.shade200),
+
+                  Column(
+                    children: [
+                      const Icon(Icons.local_parking, color: Colors.blue),
+                      const SizedBox(height: 4),
+                      const Text(
+                        "Puestos Vacíos",
+                        style: TextStyle(fontSize: 11, color: Colors.grey),
+                      ),
+                      Text(
+                        "${station.numDocksAvailable}",
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                          color: Colors.blue,
                         ),
-                      ],
-                    ),
-                    Text(
-                      "${station.capacity}",
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.blue,
                       ),
-                    ),
-                  ],
-                ),
+                    ],
+                  ),
+                ],
               ),
+            ),
 
-              const Divider(height: 40),
-              const Text(
-                "Detalle por tipo",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 10),
+            const SizedBox(height: 30),
 
-              ListView(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                children: station.availableTypes.map((type) {
-                  final bool isElectric = type.id.toLowerCase().contains(
-                    "efit",
-                  );
-
-                  return ListTile(
-                    leading: Icon(
-                      isElectric
-                          ? Icons.bolt
-                          : type.id.toLowerCase().contains("fit")
-                          ? Icons.directions_bike
-                          : null,
-                      color: type.id.toLowerCase().contains("efit")
-                          ? Colors.amber
-                          : type.id.toLowerCase().contains("fit")
-                          ? Colors.blueGrey
-                          : Colors.white,
-                    ),
-                    title: Text(
-                      type.id.toLowerCase().contains("efit")
-                          ? "Eléctrica (EFIT)"
-                          : type.id.toLowerCase().contains("fit")
-                          ? "Mecánica (FIT)"
-                          : " ",
-                    ),
-                    trailing: Text(
-                      type.id.toLowerCase().contains("efit")
-                          ? "${type.count}"
-                          : type.id.toLowerCase().contains("fit")
-                          ? "${type.count}"
-                          : " ",
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  );
-                }).toList(),
-              ),
-            ],
-          ),
-        ],
+            Text(
+              "Capacidad total de la estación: ${station.capacity}",
+              style: const TextStyle(color: Colors.grey, fontSize: 12),
+            ),
+          ],
+        ),
       ),
     );
   }

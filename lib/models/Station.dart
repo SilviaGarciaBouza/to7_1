@@ -5,10 +5,10 @@ class Station {
     required this.id,
     required this.name,
     required this.capacity,
-    required this.numBikesAvailable, // = 0,
-    required this.numDocksAvailable, // = 0,
-    required this.lastReported, // = 0,
-    required this.availableTypes, // = cont[],
+    required this.numBikesAvailable,
+    required this.numDocksAvailable,
+    required this.lastReported,
+    required this.availableTypes,
   });
 
   //https://acoruna.publicbikesystem.net/customer/gbfs/v2/gl/station_information

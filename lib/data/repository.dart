@@ -7,10 +7,19 @@ class Repository {
   final Api api;
 
   Future<List<Station>> getListStation() async {
+    final urlInfo = Uri.https(
+      'acoruna.publicbikesystem.net',
+      '/customer/gbfs/v2/gl/station_information',
+    );
+
+    final urlStatus = Uri.https(
+      'acoruna.publicbikesystem.net',
+      '/customer/gbfs/v2/gl/station_status',
+    );
     try {
       List<Station> stationsList = [];
-      final infoJson = await api.getStationInfo();
-      final statusJson = await api.getStationStatus();
+      final infoJson = await api.getStation(urlInfo);
+      final statusJson = await api.getStation(urlStatus);
       for (var info in infoJson) {
         final status = statusJson.firstWhere(
           (s) => s['station_id'] == info['station_id'],
