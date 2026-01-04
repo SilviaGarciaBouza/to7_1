@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:to7_1/data/api.dart';
 import 'package:to7_1/data/repository.dart';
 import 'package:to7_1/models/Station.dart';
+import 'package:to7_1/viewmodels/stationViewModel.dart';
 import 'package:to7_1/views/StationDetailScreen.dart';
 
 class StationListScreen extends StatefulWidget {
@@ -14,84 +15,70 @@ class StationListScreen extends StatefulWidget {
 class _StationListScreenState extends State<StationListScreen> {
   String wordSearch = '';
   TextEditingController biciController = TextEditingController();
-
-  final Repository repository = Repository(api: Api());
-  List<Station> stations = [];
-  List<Station> stationsSearch = [];
-  bool isLoading = true;
-  String? errorMessage;
+  final Stationviewmodel viewModel = Stationviewmodel(
+    repository: Repository(api: Api()),
+  );
 
   @override
   void initState() {
     super.initState();
-    loadData();
-  }
-
-  Future<void> loadData() async {
-    setState(() {
-      isLoading = true;
-      errorMessage = null;
-    });
-
-    try {
-      final datos = await repository.getListStation();
-      setState(() {
-        stations = datos;
-        stationsSearch = stations;
-        isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        errorMessage = e.toString();
-        isLoading = false;
-      });
-    }
+    viewModel.loadStations();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Color(0xFFF5F5F5),
-      appBar: AppBar(
-        title: Center(
-          child: Text(
-            'BiciCoruña',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
+    //ListenableBuilder x scuxar cambs del vm
+    return ListenableBuilder(
+      listenable: viewModel,
+      builder: (context, child) {
+        return Scaffold(
+          backgroundColor: const Color(0xFFF5F5F5),
+          appBar: AppBar(
+            title: const Center(
+              child: Text(
+                'BiciCoruña',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+              ),
             ),
+            backgroundColor: Colors.white,
+            elevation: 0,
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.refresh, color: Colors.black87),
+
+                onPressed: viewModel.loadStations,
+              ),
+            ],
           ),
-        ),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        actions: [
-          IconButton(
-            icon: Icon(Icons.refresh, color: Colors.black87),
-            onPressed: loadData,
-          ),
-        ],
-      ),
-      body: biciBody(),
+          body: biciBody(),
+        );
+      },
     );
   }
 
   Widget biciBody() {
-    if (isLoading) {
-      return Center(child: CircularProgressIndicator());
+    if (viewModel.isLoad) {
+      return const Center(child: CircularProgressIndicator());
     }
 
-    if (errorMessage != null) {
+    if (viewModel.errorMesage != null) {
       return Center(
         child: Padding(
-          padding: EdgeInsets.all(20.0),
+          padding: const EdgeInsets.all(20.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text('Error: $errorMessage', textAlign: TextAlign.center),
-              SizedBox(height: 10),
+              Text(
+                'Error: ${viewModel.errorMesage}',
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 10),
               ElevatedButton(
-                onPressed: loadData,
-                child: Text('Volver a cargar'),
+                onPressed: viewModel.loadStations,
+                child: const Text('Volver a cargar'),
               ),
             ],
           ),
@@ -99,53 +86,48 @@ class _StationListScreenState extends State<StationListScreen> {
       );
     }
 
-    if (stations.isEmpty) {
-      return Center(child: Text('No hay estaciones disponibles'));
+    if (viewModel.listStation.isEmpty) {
+      return const Center(child: Text('No hay estaciones disponibles'));
     }
+
+    final stationsSearch = viewModel.listStation.where((e) {
+      return e.name.toUpperCase().contains(wordSearch.toUpperCase());
+    }).toList();
 
     return Column(
       children: [
         Expanded(
-          flex: 1,
-          child: TextField(
-            autofocus: true,
-            controller: biciController,
-            decoration: InputDecoration(
-              hintText: "Nombre de la parada",
-              prefixIcon: Icon(Icons.search),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(25.0)),
+          flex: 2,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: TextField(
+              controller: biciController,
+              decoration: const InputDecoration(
+                hintText: "Nombre de la parada",
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(25.0)),
+                ),
               ),
+              onChanged: (value) {
+                setState(() {
+                  wordSearch = value;
+                });
+              },
             ),
-            onChanged: (value) {
-              setState(() {
-                wordSearch = value;
-                if (wordSearch.isEmpty) {
-                  stationsSearch = stations;
-                } else {
-                  stationsSearch = stations
-                      .where(
-                        (e) => e.name.toUpperCase().contains(
-                          wordSearch.toUpperCase(),
-                        ),
-                      )
-                      .toList();
-                }
-              });
-            },
           ),
         ),
-        Expanded(flex: 1, child: Row()),
+        const Expanded(flex: 1, child: Row()),
         Expanded(
           flex: 16,
           child: ListView.builder(
-            padding: EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
             itemCount: stationsSearch.length,
             itemBuilder: (context, index) {
               final station = stationsSearch[index];
 
               return Container(
-                margin: EdgeInsets.only(bottom: 12),
+                margin: const EdgeInsets.only(bottom: 12),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   border: Border.all(
@@ -157,7 +139,6 @@ class _StationListScreenState extends State<StationListScreen> {
                     width: 1.0,
                     style: BorderStyle.solid,
                   ),
-
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: GestureDetector(
@@ -171,7 +152,7 @@ class _StationListScreenState extends State<StationListScreen> {
                     );
                   },
                   child: Padding(
-                    padding: EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(16),
                     child: Row(
                       children: [
                         Tooltip(
@@ -179,9 +160,8 @@ class _StationListScreenState extends State<StationListScreen> {
                           child: Container(
                             width: 50,
                             height: 50,
-                            decoration: BoxDecoration(
+                            decoration: const BoxDecoration(
                               color: Colors.white,
-
                               shape: BoxShape.circle,
                             ),
                             child: Center(
@@ -200,16 +180,14 @@ class _StationListScreenState extends State<StationListScreen> {
                             ),
                           ),
                         ),
-
-                        SizedBox(width: 16),
-
+                        const SizedBox(width: 16),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
                                 station.name,
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,
                                   color: Colors.black,
@@ -217,22 +195,21 @@ class _StationListScreenState extends State<StationListScreen> {
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
-                              SizedBox(height: 6),
-
+                              const SizedBox(height: 6),
                               Tooltip(
                                 message: 'Puestos vacíos',
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Icon(
+                                    const Icon(
                                       Icons.local_parking_rounded,
                                       size: 18,
                                       color: Colors.grey,
                                     ),
-                                    SizedBox(width: 4),
+                                    const SizedBox(width: 4),
                                     Text(
                                       '${station.numDocksAvailable}',
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         color: Colors.grey,
                                         fontWeight: FontWeight.w500,
                                       ),
@@ -243,8 +220,7 @@ class _StationListScreenState extends State<StationListScreen> {
                             ],
                           ),
                         ),
-
-                        Tooltip(
+                        const Tooltip(
                           message: 'Ver detalles',
                           child: Icon(
                             Icons.arrow_forward_ios_rounded,
@@ -261,74 +237,39 @@ class _StationListScreenState extends State<StationListScreen> {
           ),
         ),
         Expanded(
-          flex: 1,
+          flex: 2,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Text(
-                  "Bicicletas disponibles",
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12,
-                  ),
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                decoration: BoxDecoration(
-                  color: Colors.green,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Text(
-                  "> 8",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12,
-                  ),
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                decoration: BoxDecoration(
-                  color: Colors.orange,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Text(
-                  "< 8",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12,
-                  ),
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                decoration: BoxDecoration(
-                  color: Colors.red,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Text(
-                  " 0 ",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12,
-                  ),
-                ),
-              ),
+              buildLegendItem("Disponibles", Colors.black, Colors.white),
+              buildLegendItem("> 8", Colors.white, Colors.green),
+              buildLegendItem("< 8", Colors.white, Colors.orange),
+              buildLegendItem(" 0 ", Colors.white, Colors.red),
             ],
           ),
         ),
       ],
+    );
+  }
+
+  Widget buildLegendItem(String text, Color textColor, Color bgColor) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(10),
+        border: bgColor == Colors.white
+            ? Border.all(color: Colors.grey.shade300)
+            : null,
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          color: textColor,
+          fontWeight: FontWeight.bold,
+          fontSize: 12,
+        ),
+      ),
     );
   }
 }

@@ -20,6 +20,10 @@ class StationDetailScreen extends StatelessWidget {
     final time =
         "${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}";
 
+    final int inhabilitados =
+        station.capacity -
+        (station.numBikesAvailable + station.numDocksAvailable);
+
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(
@@ -49,18 +53,22 @@ class StationDetailScreen extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  Icon(Icons.pedal_bike, size: 40, color: statusColor),
-                  Text(
-                    "${station.numBikesAvailable}",
-                    style: TextStyle(
-                      fontSize: 48,
-                      fontWeight: FontWeight.bold,
-                      color: statusColor,
+                  Tooltip(
+                    message: 'Bicicletas totales disponibles',
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.pedal_bike, size: 40, color: statusColor),
+                        Text(
+                          "${station.numBikesAvailable}",
+                          style: TextStyle(
+                            fontSize: 48,
+                            fontWeight: FontWeight.bold,
+                            color: statusColor,
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                  const Text(
-                    "Bicicletas totales",
-                    style: TextStyle(fontSize: 16, color: Colors.black54),
                   ),
                 ],
               ),
@@ -113,7 +121,7 @@ class StationDetailScreen extends StatelessWidget {
                       const Icon(Icons.local_parking, color: Colors.blue),
                       const SizedBox(height: 4),
                       const Text(
-                        "Puestos Vacíos",
+                        "Vacíos",
                         style: TextStyle(fontSize: 11, color: Colors.grey),
                       ),
                       Text(
@@ -122,6 +130,30 @@ class StationDetailScreen extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                           fontSize: 18,
                           color: Colors.blue,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  Container(height: 40, width: 1, color: Colors.grey.shade200),
+
+                  Column(
+                    children: [
+                      const Icon(
+                        Icons.build_circle_outlined,
+                        color: Colors.redAccent,
+                      ),
+                      const SizedBox(height: 4),
+                      const Text(
+                        "Rotos",
+                        style: TextStyle(fontSize: 11, color: Colors.grey),
+                      ),
+                      Text(
+                        "${inhabilitados < 0 ? 0 : inhabilitados}",
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                          color: Colors.redAccent,
                         ),
                       ),
                     ],
