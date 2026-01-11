@@ -26,6 +26,12 @@ class _StationListScreenState extends State<StationListScreen> {
   }
 
   @override
+  void dispose() {
+    biciController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     //ListenableBuilder x scuxar cambs del vm
     return ListenableBuilder(
