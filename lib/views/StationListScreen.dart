@@ -241,10 +241,10 @@ class _StationListScreenState extends State<StationListScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              buildLegendItem("Disponibles", Colors.black, Colors.white),
-              buildLegendItem("> 8", Colors.white, Colors.green),
-              buildLegendItem("< 8", Colors.white, Colors.orange),
-              buildLegendItem(" 0 ", Colors.white, Colors.red),
+              buildLegendItem("Disponibles", Colors.white),
+              buildLegendItem("> 8", Colors.green),
+              buildLegendItem("< 8", Colors.orange),
+              buildLegendItem(" 0 ", Colors.red),
             ],
           ),
         ),
@@ -252,24 +252,25 @@ class _StationListScreenState extends State<StationListScreen> {
     );
   }
 
-  Widget buildLegendItem(String text, Color textColor, Color bgColor) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(10),
-        border: bgColor == Colors.white
-            ? Border.all(color: Colors.grey.shade300)
-            : null,
-      ),
-      child: Text(
-        text,
-        style: TextStyle(
-          color: textColor,
-          fontWeight: FontWeight.bold,
-          fontSize: 12,
+  Widget buildLegendItem(String text, Color color) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 12,
+          height: 12,
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
         ),
-      ),
+        const SizedBox(width: 6),
+        Text(
+          text,
+          style: const TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+            color: Colors.black54,
+          ),
+        ),
+      ],
     );
   }
 }
