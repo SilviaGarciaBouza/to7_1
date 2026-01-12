@@ -7,8 +7,8 @@ class Api {
 
   Api({http.Client? client}) : _client = client ?? http.Client();
 
-  Future<List<dynamic>> _getJson(String path) async {
-    final url = Uri.https(_baseUrl, path);
+  Future<List<dynamic>> _getJson(Uri url) async {
+   // final url = Uri.https(_baseUrl, path);
     final response = await _client.get(
       url,
       headers: {'Accept': 'application/json'},
@@ -23,8 +23,8 @@ class Api {
   }
 
   Future<List<dynamic>> getStationInformation() =>
-      _getJson('/customer/gbfs/v2/gl/station_information');
+      _getJson(Uri.https(_baseUrl,'/customer/gbfs/v2/gl/station_information'));
 
   Future<List<dynamic>> getStationStatus() =>
-      _getJson('/customer/gbfs/v2/gl/station_status');
+      _getJson(Uri.https(_baseUrl,'/customer/gbfs/v2/gl/station_status'));
 }
