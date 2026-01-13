@@ -11,8 +11,8 @@ class Stationviewmodel extends ChangeNotifier {
   Future<void> loadStations() async {
     isLoad = true;
     errorMesage = null;
+    //avsar pra por el spinner
     notifyListeners();
-
     try {
       listStation = await repository.getListStation();
     } catch (e) {

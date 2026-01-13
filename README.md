@@ -1,16 +1,39 @@
-# to7_1
+# Aplicación que utiliza la Api de BiciCoruña
 
-A new Flutter project.
+Este proyecto es una aplicación móvil desarrollada en **Flutter** que ofrece una alternativa a la aplicación oficial de BiciCoruña.
 
-## Getting Started
+## Requisitos del Proyecto
 
-This project is a starting point for a Flutter application.
+- **Selector de estaciones:**
+  Listado con buscador por nombre.
+- **Información detallada:**
+  - Última actualización.
+  - Capacidad total de la estación.
+  - Desglose de bicicletas disponibles por tipo (Eléctricas vs Mecánicas).
+  - Número de anclajes vacíos.
+  - Cálculo de puestos rotos.
+- **Gestión de estados:**
+  Implementación de estados de Carga (Loading), Error (con mensaje y reintento) y Éxito.
 
-A few resources to get you started if this is your first Flutter project:
+## Arquitectura: MVVM
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+Se ha implementado el patrón de arquitectura **MVVM (Model-View-ViewModel)**:
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- **Model:** Definición de las clases de datos (`Station`, `BikeType`) y lógica de parseo JSON mediante _factory constructors_.
+- **View:** Interfaces de usuario (`StationListScreen`, `StationDetailScreen`) que reaccionan a los cambios de estado.
+- **ViewModel:** Encargado de la lógica de negocio, manejo de estados de carga/error y comunicación con el repositorio.
+- **Data Layer:**
+  - `Api`: Cliente HTTP para peticiones JSON.
+  - `Repository`: Lógica de cruce de datos entre `station_information` y `station_status` para consolidar la información en un único modelo.
+
+## Fuente de Datos
+
+- [Station Information](https://acoruna.publicbikesystem.net/customer/gbfs/v2/gl/station_information) (Datos estáticos: nombre, capacidad, ubicación).
+- [Station Status](https://acoruna.publicbikesystem.net/customer/gbfs/v2/gl/station_status) (Datos dinámicos: bicis disponibles, anclajes libres).
+
+## Características Técnicas
+
+- **Combinación de datos:** Se utiliza un mapeo por `station_id` para unir la información de dos endpoints distintos en una sola entidad.
+- **Buscador reactivo:** Filtrado dinámico de la lista mediante `TextField`.
+- **UI Semántica:** Uso de colores condicionales (Verde/Naranja/Rojo) para indicar visualmente la disponibilidad de bicicletas.
+- **Manejo de errores:** Manejo de excepciones y tiempos de espera (timeouts) en las peticiones de red.

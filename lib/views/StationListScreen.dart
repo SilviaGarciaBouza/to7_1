@@ -54,7 +54,6 @@ class _StationListScreenState extends State<StationListScreen> {
             actions: [
               IconButton(
                 icon: const Icon(Icons.refresh, color: Colors.black87),
-
                 onPressed: viewModel.loadStations,
               ),
             ],
@@ -84,7 +83,7 @@ class _StationListScreenState extends State<StationListScreen> {
               const SizedBox(height: 10),
               ElevatedButton(
                 onPressed: viewModel.loadStations,
-                child: const Text('Volver a cargar'),
+                child: const Text('Reintentar'),
               ),
             ],
           ),
