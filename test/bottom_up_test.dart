@@ -11,7 +11,7 @@ void main() {
       final repository = Repository(api: api);
       List<Station> resultado = await repository.getListStation();
       expect(resultado.isNotEmpty, true);
-      final firstStatn = resultado.first;
+      final firstStatn = resultado[0];
       expect(firstStatn.name.isNotEmpty, true);
       expect(firstStatn.numBikesAvailable >= 0, true);
     },
