@@ -18,7 +18,7 @@ class Api {
     final decoded = jsonDecode(response.body);
     if (decoded is! Map<String, dynamic>) {
       throw Exception(
-        'Se esperaba un objeto JSON (Map<String, dynamic>), llegó: ${decoded.runtimeType}',
+        'Se esperaba un objeto JSON (Map<String, dynamic>), pero llegó: ${decoded.runtimeType}',
       );
     }
     return decoded;
