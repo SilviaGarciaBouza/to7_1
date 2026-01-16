@@ -6,7 +6,7 @@ import 'package:to7_1/models/BikeType.dart';
 class Repository {
   final Api api;
 
-  Repository({required this.api});
+  Repository( {required this.api});
 
   Future<List<Station>> getListStation() async {
     final String _baseUrl = 'acoruna.publicbikesystem.net';

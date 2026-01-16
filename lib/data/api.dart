@@ -11,6 +11,7 @@ class Api {
         .get(url, headers: {'Accept': 'application/json'})
         .timeout(const Duration(seconds: 10));
 
+
     if (response.statusCode != 200) {
       throw Exception('GET ${url.path} -> ${response.statusCode}');
     }

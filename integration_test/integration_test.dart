@@ -19,10 +19,10 @@ void main() {
       await tester.enterText(find.byType(TextField), 'Pontevedra');
       await tester.pumpAndSettle();
 
-      final paradaFinder = find.textContaining('Pontevedra');
-      expect(paradaFinder, findsAtLeastNWidgets(1));
+    
+      expect(, findsAtLeastNWidgets(1));
 
-      await tester.tap(paradaFinder.first);
+      await tester.tap(find.textContaining('Pontevedra').first);
       await tester.pumpAndSettle();
 
       // expect(find.byIcon(Icons.pedal_bike), findsOneWidget);

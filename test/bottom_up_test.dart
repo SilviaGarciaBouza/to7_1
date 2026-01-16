@@ -25,20 +25,22 @@ void main() {
       };
       return http.Response(jsonEncode(mapListStationsJson), 200);
     });
+final mockClientError = MockClient((request) async {  
+      return http.Response(jsonEncode({}), 400);
+    });
 
+    
     final api = Api(client: mockClient);
     final repository = Repository(api: api);
-
     final viewModel = Stationviewmodel(repository: repository);
-
     await viewModel.loadStations();
-
-    expect(viewModel.listStation.length, 1);
-
+    
     final station = viewModel.listStation.first;
+
     expect(station.id, '1');
     expect(station.name, 'Prueba');
     expect(station.numBikesAvailable, 8);
+    expect(viewModel.listStation.length, 1);
     expect(viewModel.isLoad, false);
     expect(viewModel.errorMesage, isNull);
   });
