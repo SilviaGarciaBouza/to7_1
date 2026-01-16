@@ -1,41 +1,45 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
+import 'dart:convert';
+
 import 'package:to7_1/data/api.dart';
 import 'package:to7_1/data/repository.dart';
-import 'package:to7_1/models/Station.dart';
+import 'package:to7_1/viewmodels/stationViewModel.dart';
 
 void main() {
+  test('Prueba de Integración Bottom-Up', () async {
+    final mockClient = MockClient((request) async {
+      final mapListStationsJson = {
+        'data': {
+          'stations': [
+            {
+              'station_id': '1',
+              'name': 'Prueba',
+              'capacity': 20,
+              'num_bikes_available': 8,
+              'num_docks_available': 7,
+            },
+          ],
+        },
+      };
+      return http.Response(jsonEncode(mapListStationsJson), 200);
+    });
 
-  test(
-    'Validar que el Repository procesa correctamente los datos de la API',
-    () async {
-      final repository = FalseStationRepository();
-      List<Station> resultado = await repository.getListStation();
-      
-      expect(resultado.isNotEmpty, true);
-      final firstStatn = resultado[0];
-      expect(firstStatn.name.isNotEmpty, true);
-      expect(firstStatn.numBikesAvailable >= 0, true);
-      }
-     
-    
-  );
-}
+    final api = Api(client: mockClient);
+    final repository = Repository(api: api);
 
+    final viewModel = Stationviewmodel(repository: repository);
 
-class FalseStationRepository extends Repository {
-  FalseStationRepository() : super(api: Api());
-  @override
-  Future<List<Station>> getListStation() async {
-    return [
-      Station(
-        id: '1',
-        name: 'Prueba',
-        capacity: 10,
-        numBikesAvailable: 5,
-        numDocksAvailable: 5,
-        lastReported: 0,
-        availableTypes: [],
-      ),
-    ];
-  }
+    await viewModel.loadStations();
+
+    expect(viewModel.listStation.length, 1);
+
+    final station = viewModel.listStation.first;
+    expect(station.id, '1');
+    expect(station.name, 'Prueba');
+    expect(station.numBikesAvailable, 8);
+    expect(viewModel.isLoad, false);
+    expect(viewModel.errorMesage, isNull);
+  });
 }
