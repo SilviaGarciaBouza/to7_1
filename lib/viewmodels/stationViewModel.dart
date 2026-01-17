@@ -10,12 +10,15 @@ class Stationviewmodel extends ChangeNotifier {
   String? errorMesage;
   Future<void> loadStations() async {
     isLoad = true;
+    //Limpiamos errores anteriores
     errorMesage = null;
     //avsar pra por el spinner
     notifyListeners();
     try {
+      //Esperamos que el Repository y la Api funciones
       listStation = await repository.getListStation();
     } catch (e) {
+      //Capturamos de errores de la API o el Repository
       errorMesage = e.toString();
       listStation = [];
     } finally {
