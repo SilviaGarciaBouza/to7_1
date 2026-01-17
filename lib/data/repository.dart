@@ -6,7 +6,7 @@ import 'package:to7_1/models/BikeType.dart';
 class Repository {
   final Api api;
 
-  Repository( {required this.api});
+  Repository({required this.api});
 
   Future<List<Station>> getListStation() async {
     final String _baseUrl = 'acoruna.publicbikesystem.net';
@@ -19,9 +19,10 @@ class Repository {
       Uri.https(_baseUrl, '/customer/gbfs/v2/gl/station_status'),
     );
 
-    final List<dynamic> infoList = infoResponse['data']['stations'] ?? [];
-    final List<dynamic> statusList = statusResponse['data']['stations'] ?? [];
-
+    final infoList = (infoResponse['data']['stations'] as List)
+        .cast<Map<String, dynamic>>();
+    final statusList = (statusResponse['data']['stations'] as List)
+        .cast<Map<String, dynamic>>();
     /* final Map<String, dynamic> statusMapId = {
       for (var statusId in statusList) statusId['station_id']: statusId,
     };
