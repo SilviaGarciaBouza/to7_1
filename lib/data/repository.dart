@@ -66,10 +66,23 @@ class Repository {
 
 
 
+/*
 
-
-
-
+class ApiTest extends Api {
+  @override
+  Future<Map<String, dynamic>> getJson(Uri url) async {
+    //  Devolvemos datos fijos para que la UI y el ViewModel puedan
+    // funcionar sin necesidad de conectar con el servidor real.
+    return {
+      'data': {
+        'stations': [
+          {'station_id': '1', 'name': 'Prueba', 'capacity': 10},
+        ],
+      },
+    };
+  }
+}
+*/
 
 
 

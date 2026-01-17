@@ -1,154 +1,170 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:to7_1/data/api.dart';
-import 'package:to7_1/data/repository.dart';
-import 'package:to7_1/models/Station.dart';
 import 'package:to7_1/models/BikeType.dart';
+import 'package:to7_1/models/Station.dart';
+import 'package:to7_1/data/repository.dart';
+import 'package:to7_1/data/api.dart';
 import 'package:to7_1/viewmodels/stationViewModel.dart';
 
 void main() {
-  group('1-Mapeo de las clases modelo', () {
-    test('BikeType asigna valores por defecto si el JSON no los contiene', () {
-      expect(BikeType.fromJson({}).id, 'id unknown');
-      expect(BikeType.fromJson({}).count, 0);
+  group('GRUPO 1: Pruebas de los modelos BikeType y Station', () {
+    test('Prueba BikeType datos reales', () {
+      final bike = BikeType.fromJson({'vehicle_type_id': '1', 'count': 2});
+      expect(bike.count, 2);
+      expect(bike.id, '1');
     });
 
-    test('Station guarda bien el nombre', () {
-      expect(
-        Station.fromJson({'name': 'Plaza De Pontevedra'}).name,
-        'Plaza De Pontevedra',
-      );
+    test('Prueba BikeType datos vacios', () {
+      final bike = BikeType.fromJson({});
+      expect(bike.id, 'id unknown');
+      expect(bike.count, 0);
     });
 
-    test('El count de BikeType se mapea aunque sea un doube', () {
-      expect(BikeType.fromJson({'count': 2.0}).count, 2);
-      expect(BikeType.fromJson({'count': 3.5}).count, 3);
+    test('Prueba BikeType paso de double a int', () {
+      final bike = BikeType.fromJson({'vehicle_type_id': '1', 'count': 2.0});
+      expect(bike.count, 2);
     });
 
-    test('Station calcula correctamente los puestos rotos', () {
-      final st = Station.fromJson({
-        'capacity': 5,
-        'num_bikes_available': 1,
-        'num_docks_available': 1,
+    test('Prueba Station datos reales', () {
+      final station = Station.fromJson({
+        'station_id': '1',
+        'name': 'Name',
+        'capacity': 8,
+        'num_bikes_available': 2,
+        'num_docks_available': 4,
+        'last_reported': 12334,
+        'vehicle_types_available': [],
       });
-      expect(st.capacity - (st.numBikesAvailable + st.numDocksAvailable), 3);
-    });
-  });
-  group('2-Mapeo', () {
-    test('Unión de los datos de las dos fuentes por su id.', () {
-      final info = {
-        'station_id': '1',
-        'name': 'Plaza De Pontevedra',
-        'capacity': 11,
-      };
-      final status = {
-        'station_id': '1',
-        'num_bikes_available': 3,
-        'num_docks_available': 8,
-      };
-      final Map<String, dynamic> combinedMap = {};
-      combinedMap.addAll(info);
-      combinedMap.addAll(status);
-      final station = Station.fromJson(combinedMap);
-      expect(station.name, 'Plaza De Pontevedra');
-      expect(station.numBikesAvailable, 3);
       expect(station.id, '1');
+      expect(station.name, 'Name');
     });
-    test('Gestión de errores cuando faltan datos del estado.', () {
-      final Map<String, dynamic> info = {
-        'station_id': '1',
-        'name': 'Plaza De Pontevedra',
-        'capacity': 11,
-      };
-      final Map<String, dynamic> status = {};
-      final Map<String, dynamic> combinedMap = {};
-      combinedMap.addAll(info);
-      combinedMap.addAll(status);
-      final station = Station.fromJson(combinedMap);
-      expect(station.name, 'Plaza De Pontevedra');
-      expect(station.numBikesAvailable, 0);
-      expect(station.numDocksAvailable, 0);
-    });
-    test('Comportamiento ante listas vacías.', () {
-      final Map<String, dynamic> status = {};
-      final Map<String, dynamic> info = {};
-      final Map<String, dynamic> combinedMp = {};
-      combinedMp.addAll(info);
-      combinedMp.addAll(status);
-      final station = Station.fromJson(combinedMp);
 
+    test('Prueba Station datos vacios', () {
+      final station = Station.fromJson({'station_id': '1', 'capacity': 8});
+      expect(station.lastReported, 0);
       expect(station.name, 'name unknown');
-      expect(station.numBikesAvailable, 0);
     });
 
-    test('Número correcto de estaciones.', () {
-      final List<dynamic> infoList = [
-        {'station_id': '1', 'name': 'Plaza De Pontevedra', 'capacity': 8},
-        {'station_id': '2', 'name': 'Aquarium', 'capacity': 9},
-        {'station_id': '3', 'name': 'Plaza de Lugo', 'capacity': 10},
-      ];
-
-      final List<dynamic> statusList = [
-        {'station_id': '1', 'num_bikes_available': 3},
-        {'station_id': '2', 'num_bikes_available': 4},
-      ];
-
-      final resultList = infoList.map((e) {
-        final String id = e['station_id'];
-        final statusElement = statusList.firstWhere(
-          (element) => element['station_id'] == id,
-          orElse: () => <String, dynamic>{},
-        );
-
-        final Map<String, dynamic> combinedMap = {};
-        combinedMap.addAll(e);
-        combinedMap.addAll(statusElement);
-        return Station.fromJson(combinedMap);
-      }).toList();
-      expect(resultList.length, 3);
+    test('Prueba Station paso de double a int', () {
+      final station = Station.fromJson({
+        'station_id': '1',
+        'name': 'Name',
+        'capacity': 8,
+        'num_bikes_available': 2.8,
+        'num_docks_available': 4.0,
+      });
+      expect(station.numBikesAvailable, 2);
+      expect(station.numDocksAvailable, 4);
     });
   });
 
-  Stationviewmodel vm = Stationviewmodel(repository: SuccessRepository());
-  Stationviewmodel vmError = Stationviewmodel(repository: ErrorRepository());
-  group('3-Gestión del estado de la pantalla', () {
-    test('Control del estado de carga.', () async {
-      expect(vm.isLoad, false);
-      final action = vm.loadStations();
-      expect(vm.isLoad, true);
-      await action;
-      expect(vm.isLoad, false);
+  group('GRUPO 2: Pruebas del ViewModel', () {
+    late Stationviewmodel vmSuccess;
+    late Stationviewmodel vmError;
+
+    setUp(() {
+      vmSuccess = Stationviewmodel(repository: FakeRepoSuccess());
+      vmError = Stationviewmodel(repository: FakeRepoError());
     });
 
-    test('Gestión de errores en la carga.', () async {
+    test('Prueba viewmodel isLoad', () async {
+      expect(vmSuccess.isLoad, false);
+      final loadTask = vmSuccess.loadStations();
+      expect(vmSuccess.isLoad, true);
+      await loadTask;
+      expect(vmSuccess.isLoad, false);
+    });
+
+    test('Prueba viewModel que no falla', () async {
+      await vmSuccess.loadStations();
+      expect(vmSuccess.listStation.length, 1);
+      expect(vmSuccess.errorMesage, isNull);
+    });
+
+    test('Prueba viewModel que falla', () async {
       await vmError.loadStations();
-      expect(vmError.errorMesage, isNotNull);
-      expect(vmError.listStation.length, 0);
+
+      expect(vmError.errorMesage, 'Prueba de error');
+    });
+  });
+
+  group('GRUPO 3: Pruebas de Repository', () {
+    late Repository repo;
+    late Repository repoError;
+
+    setUp(() {
+      repo = Repository(api: FakeApiSuccess());
+      repoError = Repository(api: FakeApiError());
+    });
+
+    test('El Repository combina correctamente los datos', () async {
+      final listStation = await repo.getListStation();
+      expect(listStation.isNotEmpty, true);
+      expect(listStation[0].name, 'Prueba');
+      expect(listStation[0].numBikesAvailable, 5);
+    });
+
+    test('El Repository lanza la excepción si ocurre un error.', () async {
+      expect(() => repoError.getListStation(), throwsException);
     });
   });
 }
 
-class ErrorRepository extends Repository {
-  ErrorRepository() : super(api: Api());
+class FakeApiSuccess extends Api {
   @override
-  Future<List<Station>> getListStation() async {
-    return Future.error('Error 500');
+  Future<Map<String, dynamic>> getJson(Uri url) async {
+    if (url.toString().contains('station_information')) {
+      return {
+        'data': {
+          'stations': [
+            {'station_id': '1', 'name': 'Prueba', 'capacity': 10},
+          ],
+        },
+      };
+    } else {
+      return {
+        'data': {
+          'stations': [
+            {
+              'station_id': '1',
+              'num_bikes_available': 5,
+              'num_docks_available': 5,
+            },
+          ],
+        },
+      };
+    }
   }
 }
 
-class SuccessRepository extends Repository {
-  SuccessRepository() : super(api: Api());
+class FakeApiError extends Api {
+  @override
+  Future<Map<String, dynamic>> getJson(Uri url) async {
+    throw Exception('Error de red simulado');
+  }
+}
+
+class FakeRepoSuccess extends Repository {
+  FakeRepoSuccess() : super(api: FakeApiSuccess());
   @override
   Future<List<Station>> getListStation() async {
     return [
       Station(
         id: '1',
-        name: 'Plaza de Pontevedra',
-        capacity: 10,
+        name: 'Prueba',
         numBikesAvailable: 5,
         numDocksAvailable: 5,
+        capacity: 10,
         lastReported: 0,
         availableTypes: [],
       ),
     ];
+  }
+}
+
+class FakeRepoError extends Repository {
+  FakeRepoError() : super(api: FakeApiError());
+  @override
+  Future<List<Station>> getListStation() async {
+    throw Exception('Prueba de error');
   }
 }
