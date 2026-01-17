@@ -23,17 +23,15 @@ class Station {
 
   factory Station.fromJson(Map<String, dynamic> json) {
     return Station(
-      id: json['station_id'] ?? 'id unknown',
-      name: json['name'] ?? 'name unknown',
-      capacity: json['capacity'] ?? 0,
-      numBikesAvailable: json['num_bikes_available'] ?? 0,
-      numDocksAvailable: json['num_docks_available'] ?? 0,
-      lastReported: json['last_reported'] ?? 0,
-      availableTypes: [],
+      id: (json['station_id'] ?? 'id unknown') as String,
+      name: (json['name'] ?? 'name unknown') as String,
+      capacity: ((json['capacity'] ?? 0) as num).toInt(),
+      numBikesAvailable: ((json['num_bikes_available'] ?? 0) as num).toInt(),
+      numDocksAvailable: ((json['num_docks_available'] ?? 0) as num).toInt(),
+      lastReported: ((json['last_reported'] ?? 0) as num).toInt(),
+      availableTypes: (json['vehicle_types_available'] as List? ?? [])
+          .map((v) => BikeType.fromJson(v))
+          .toList(),
     );
-  }
-
-  String getName() {
-    return name;
   }
 }

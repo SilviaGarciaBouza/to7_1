@@ -4,11 +4,8 @@ class BikeType {
   final int count;
   factory BikeType.fromJson(Map<String, dynamic> json) {
     return BikeType(
-      id: json['vehicle_type_id'] ?? 'id unknown',
-      count: json['count'] ?? 0,
+      id: (json['vehicle_type_id'] ?? 'id unknown') as String,
+      count: ((json['count'] ?? 0) as num).toInt(),
     );
   }
-
-
-
 }

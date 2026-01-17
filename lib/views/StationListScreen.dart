@@ -22,7 +22,14 @@ class _StationListScreenState extends State<StationListScreen> {
   @override
   void initState() {
     super.initState();
+    //Al iniciar la vista se intentan cargar los datos para la lista
     viewModel.loadStations();
+  }
+
+  @override
+  void dispose() {
+    biciController.dispose();
+    super.dispose();
   }
 
   @override
@@ -48,7 +55,7 @@ class _StationListScreenState extends State<StationListScreen> {
             actions: [
               IconButton(
                 icon: const Icon(Icons.refresh, color: Colors.black87),
-
+                //la acción del usuario baja al viemodel pra actualizar los datos
                 onPressed: viewModel.loadStations,
               ),
             ],
@@ -60,10 +67,13 @@ class _StationListScreenState extends State<StationListScreen> {
   }
 
   Widget biciBody() {
+    // Comprobamos que la UI responde al isLoad del ViewModel
+    // mostrando un CircularProgressIndicator al usuario.
     if (viewModel.isLoad) {
       return const Center(child: CircularProgressIndicator());
     }
-
+    //Si cualquier capa inferiorfalló
+    // el ViewModel nos pasa el mensaje y la UI reacciona aquí
     if (viewModel.errorMesage != null) {
       return Center(
         child: Padding(
@@ -71,20 +81,23 @@ class _StationListScreenState extends State<StationListScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              //Muestra el error
               Text(
                 'Error: ${viewModel.errorMesage}',
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 10),
+              //Se reintenta la carga de estaciones
               ElevatedButton(
                 onPressed: viewModel.loadStations,
-                child: const Text('Volver a cargar'),
+                child: const Text('Reintentar'),
               ),
             ],
           ),
         ),
       );
     }
+    // Si no hay errores, validamos que la lista se pinte correctamente con los datos recibidos.
 
     if (viewModel.listStation.isEmpty) {
       return const Center(child: Text('No hay estaciones disponibles'));
@@ -143,6 +156,8 @@ class _StationListScreenState extends State<StationListScreen> {
                 ),
                 child: GestureDetector(
                   onTap: () {
+                    //La navegación envía la estación
+                    // desde esta pantalla hacia la pantalla de detalle.
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -272,5 +287,20 @@ class _StationListScreenState extends State<StationListScreen> {
         ),
       ],
     );
+  }
+}
+
+class ApiTest extends Api {
+  @override
+  Future<Map<String, dynamic>> getJson(Uri url) async {
+    //  Devolvemos datos fijos para que la UI y el ViewModel puedan
+    // funcionar sin necesidad de conectar con el servidor real.
+    return {
+      'data': {
+        'stations': [
+          {'station_id': '1', 'name': 'Prueba', 'capacity': 10},
+        ],
+      },
+    };
   }
 }

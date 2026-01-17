@@ -8,6 +8,8 @@ class StationDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    //Comprobamos que los colores se muestran correctamente
+    // según el estado que recibimos del ViewModel.
     Color statusColor = (station.numBikesAvailable == 0)
         ? Colors.red
         : (station.numBikesAvailable < 8)
@@ -19,7 +21,7 @@ class StationDetailScreen extends StatelessWidget {
     );
     final time =
         "${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}";
-
+    //Comprobamos que el cálculo de puestos inhabilitados es correcto
     final int inhabilitados =
         station.capacity -
         (station.numBikesAvailable + station.numDocksAvailable);
