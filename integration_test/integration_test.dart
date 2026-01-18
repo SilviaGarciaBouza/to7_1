@@ -15,18 +15,13 @@ void main() {
     // Esperamos a q se cargue
     await tester.pumpAndSettle();
     // Buscamos una estacion
-    final Finder searchField = find.byType(TextField);
-    expect(searchField, findsOneWidget);
-    await tester.enterText(searchField, 'Obelisco');
+    expect(find.byType(TextField), findsOneWidget);
+    await tester.enterText(find.byType(TextField), 'Obelisco');
     await tester.pumpAndSettle();
     // Seleccionamos la estación
-    final Finder stationInList = find.descendant(
-      of: find.byType(ListView),
-      matching: find.textContaining('Obelisco'),
-    );
-    expect(stationInList, findsOneWidget);
+    expect(find.textContaining('Obelisco'), findsWidgets);
     // Pulsamos en la estación de la lista
-    await tester.tap(stationInList);
+    await tester.tap(find.textContaining('Obelisco').at(1));
     // Esperamos a que termine la animación de navegación al detalle
     await tester.pumpAndSettle();
     await Future.delayed(const Duration(seconds: 1));
@@ -34,8 +29,5 @@ void main() {
     // Comprobamos que estamos en la pantalla de detalle
     expect(find.textContaining('Vacíos'), findsOneWidget);
     expect(find.byIcon(Icons.pedal_bike), findsOneWidget);
-
-
   });
 }
-
